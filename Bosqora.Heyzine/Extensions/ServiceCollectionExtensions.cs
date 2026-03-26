@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(Constants.API_URL);
         }); 
         serviceCollection.AddTransient<IHeyzineRestClient, HeyzineRestClient>();
+        serviceCollection.AddTransient<IHeyzineManagementClient, HeyzineManagementClient>();
 
         return serviceCollection;
     }
