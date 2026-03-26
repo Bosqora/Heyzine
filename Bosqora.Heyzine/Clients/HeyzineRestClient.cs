@@ -6,6 +6,12 @@ using Bosqora.Heyzine.Models;
 
 namespace Bosqora.Heyzine.Clients;
 
+/// <summary>
+/// Default implementation of <see cref="IHeyzineRestClient"/> that wraps the Heyzine conversion and oEmbed endpoints.
+/// </summary>
+/// <remarks>
+/// The client reads the conversion client id from the <c>HeyzineClientId</c> environment variable and injects it into conversion requests.
+/// </remarks>
 public class HeyzineRestClient : IHeyzineRestClient
 {
     #region Private fields
@@ -17,6 +23,12 @@ public class HeyzineRestClient : IHeyzineRestClient
 
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeyzineRestClient"/> class.
+    /// </summary>
+    /// <param name="httpClientFactory">The factory used to create the configured Heyzine <see cref="HttpClient"/> instance.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClientFactory"/> is <see langword="null"/>.</exception>
+    /// <exception cref="EnvironmentVariableNotSetException">Thrown when the <c>HeyzineClientId</c> environment variable is missing or empty.</exception>
     public HeyzineRestClient(IHttpClientFactory httpClientFactory)
     {
         ArgumentNullException.ThrowIfNull(httpClientFactory, nameof(httpClientFactory));
@@ -31,6 +43,7 @@ public class HeyzineRestClient : IHeyzineRestClient
 
     #endregion
 
+    /// <inheritdoc />
     public Task<HeyzineResponse?> ConvertPdfAsync(Uri pdfLocation, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pdfLocation, nameof(pdfLocation));
@@ -41,6 +54,7 @@ public class HeyzineRestClient : IHeyzineRestClient
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<HeyzineResponse?> ConvertPdfAsync(HeyzineConversionRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
@@ -51,6 +65,7 @@ public class HeyzineRestClient : IHeyzineRestClient
         return await response.Content.ReadFromJsonAsync<HeyzineResponse?>(cancellationToken: cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<HeyzineOEmbedResponse?> GetOEmbedAsync(Uri flipbookUrl, int? maxWidth = null, int? maxHeight = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(flipbookUrl, nameof(flipbookUrl));
@@ -77,6 +92,7 @@ public class HeyzineRestClient : IHeyzineRestClient
         return await response.Content.ReadFromJsonAsync<HeyzineOEmbedResponse?>(cancellationToken: cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<HeyzineResponse?> StartPdfConversionAsync(HeyzineConversionRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
