@@ -30,6 +30,18 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddHeyzine_RegistersHeyzineManagementClientAsTransient()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHeyzine();
+
+        var descriptor = Assert.Single(services, sd =>
+            sd.ServiceType == typeof(IHeyzineManagementClient));
+        Assert.Equal(ServiceLifetime.Transient, descriptor.Lifetime);
+    }
+
+    [Fact]
     public void AddHeyzine_RegistersNamedHttpClient()
     {
         var services = new ServiceCollection();
