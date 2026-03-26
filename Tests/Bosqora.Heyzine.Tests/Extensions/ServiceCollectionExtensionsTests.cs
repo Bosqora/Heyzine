@@ -64,4 +64,37 @@ public class ServiceCollectionExtensionsTests
 
         Assert.Equal(new Uri("https://heyzine.com/api1/"), client.BaseAddress);
     }
+
+    [Fact]
+    public void AddHeyzine_WithConfiguredTimeout_AppliesTimeoutToNamedHttpClient()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHeyzine(options =>
+        {
+            options.Timeout = TimeSpan.FromMinutes(10);
+        });
+
+        using var provider = services.BuildServiceProvider();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+
+        using var client = factory.CreateClient(Constants.HTTPCLIENT_NAME);
+
+        Assert.Equal(TimeSpan.FromMinutes(10), client.Timeout);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void AddHeyzine_WithNonPositiveTimeout_ThrowsArgumentOutOfRangeException(int seconds)
+    {
+        var services = new ServiceCollection();
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => services.AddHeyzine(options =>
+        {
+            options.Timeout = TimeSpan.FromSeconds(seconds);
+        }));
+
+        Assert.Equal("Timeout", exception.ParamName);
+    }
 }

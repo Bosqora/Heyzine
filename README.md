@@ -25,6 +25,19 @@ using Bosqora.Heyzine.Extensions;
 builder.Services.AddHeyzine();
 ```
 
+If you use the synchronous conversion endpoint for large documents, increase the shared HTTP timeout:
+
+```csharp
+using Bosqora.Heyzine.Extensions;
+
+...
+
+builder.Services.AddHeyzine(options =>
+{
+    options.Timeout = TimeSpan.FromMinutes(10);
+});
+```
+
 Set these environment variables before use:
 
 - `HeyzineClientId` for conversion endpoints
