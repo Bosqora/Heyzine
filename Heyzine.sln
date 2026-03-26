@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bosqora.Heyzine", "Bosqora.Heyzine\Bosqora.Heyzine.csproj", "{7527B145-DC6E-F0B4-21A8-3A80144BFC8B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bosqora.Heyzine.Tests", "Tests\Bosqora.Heyzine.Tests\Bosqora.Heyzine.Tests.csproj", "{BDAFC832-10BD-8067-36DB-369152E50B21}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7527B145-DC6E-F0B4-21A8-3A80144BFC8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7527B145-DC6E-F0B4-21A8-3A80144BFC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7527B145-DC6E-F0B4-21A8-3A80144BFC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7527B145-DC6E-F0B4-21A8-3A80144BFC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDAFC832-10BD-8067-36DB-369152E50B21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDAFC832-10BD-8067-36DB-369152E50B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDAFC832-10BD-8067-36DB-369152E50B21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDAFC832-10BD-8067-36DB-369152E50B21}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BDAFC832-10BD-8067-36DB-369152E50B21} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA2542B0-D127-4C0C-884E-5700D72B1FF0}
+	EndGlobalSection
+EndGlobal
