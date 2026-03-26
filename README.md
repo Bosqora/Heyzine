@@ -1,7 +1,11 @@
 # Heyzine
 
-A .NET client for the Heyzine API (see [heyzine.com/developers](https://heyzine.com/developers)). Currently, only the REST API's POST is
-supported. We're working in the background to add support for the other endpoints.
+A .NET client for the Heyzine API (see [heyzine.com/developers](https://heyzine.com/developers)).
+
+The package exposes:
+
+- a conversion client for the PDF-to-flipbook and oEmbed endpoints
+- a management client for flipbooks, bookshelves, social metadata, and password-protection endpoints
 
 ## Why?
 
@@ -21,10 +25,14 @@ using Bosqora.Heyzine.Extensions;
 builder.Services.AddHeyzine();
 ```
 
-### Using the service
+Set these environment variables before use:
+
+- `HeyzineClientId` for conversion endpoints
+- `HeyzineApiKey` for management endpoints
+
+### Using the API endpoints
 
 ```csharp
-using Bosqora.Heyzine.Clients;
 using Bosqora.Heyzine.Clients.Interfaces;
 
 public class YourClassThatUsesHeyzine(IHeyzineRestClient heyzineRestClient)
@@ -35,6 +43,22 @@ public class YourClassThatUsesHeyzine(IHeyzineRestClient heyzineRestClient)
          var response = await heyzineRestClient.ConvertPdfAsync(pdfUrl);
 
          return response?.Url.AbsoluteUri;
+    }
+}
+```
+
+### Using the management endpoints
+
+```csharp
+using Bosqora.Heyzine.Clients.Interfaces;
+
+public class YourAdminClass(IHeyzineManagementClient heyzineManagementClient)
+{
+    public async Task<int> CountFlipbooksAsync()
+    {
+        var flipbooks = await heyzineManagementClient.ListFlipbooksAsync();
+
+        return flipbooks?.Count ?? 0;
     }
 }
 ```
