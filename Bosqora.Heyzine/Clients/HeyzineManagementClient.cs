@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
 using Bosqora.Heyzine.Clients.Interfaces;
+using Bosqora.Heyzine.Enumerations;
 using Bosqora.Heyzine.Exceptions;
 using Bosqora.Heyzine.Models;
 
@@ -14,15 +15,9 @@ namespace Bosqora.Heyzine.Clients;
 /// <remarks>
 /// The client reads the API key from the <c>HeyzineApiKey</c> environment variable and sends it as a bearer token.
 /// </remarks>
-public class HeyzineManagementClient : IHeyzineManagementClient
+public sealed class HeyzineManagementClient : IHeyzineManagementClient
 {
-    #region Fields
-
     private readonly HttpClient _httpClient;
-
-#endregion
-
-    #region Constructors
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HeyzineManagementClient"/> class.
@@ -32,10 +27,10 @@ public class HeyzineManagementClient : IHeyzineManagementClient
     /// <exception cref="EnvironmentVariableNotSetException">Thrown when the <c>HeyzineApiKey</c> environment variable is missing or empty.</exception>
     public HeyzineManagementClient(IHttpClientFactory httpClientFactory)
     {
-        ArgumentNullException.ThrowIfNull(httpClientFactory, nameof(httpClientFactory));
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
 
         var apiKey = Environment.GetEnvironmentVariable(Constants.APIKEY_SETTINGNAME);
-        if (string.IsNullOrEmpty(apiKey))
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw new EnvironmentVariableNotSetException(Constants.APIKEY_SETTINGNAME);
         }
@@ -43,8 +38,6 @@ public class HeyzineManagementClient : IHeyzineManagementClient
         _httpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
     }
-
-    #endregion
 
     /// <inheritdoc />
     public Task<HeyzineApiResult?> AddFlipbookToBookshelfAsync(HeyzineBookshelfFlipbookRequest request, CancellationToken cancellationToken = default)
@@ -55,12 +48,14 @@ public class HeyzineManagementClient : IHeyzineManagementClient
     /// <inheritdoc />
     public Task<HeyzineApiResult?> AddUserAccessAsync(HeyzineAccessEntryRequest request, CancellationToken cancellationToken = default)
     {
+        ValidateAccessEntryRequest(request);
         return PostAsync<HeyzineAccessEntryRequest, HeyzineApiResult>(Constants.ACCESS_ADD_POSTFIX, request, cancellationToken);
     }
 
     /// <inheritdoc />
     public Task<HeyzineApiResult?> ConfigurePasswordProtectionAsync(HeyzineAccessSetupRequest request, CancellationToken cancellationToken = default)
     {
+        ValidateAccessSetupRequest(request);
         return PostAsync<HeyzineAccessSetupRequest, HeyzineApiResult>(Constants.ACCESS_SETUP_POSTFIX, request, cancellationToken);
     }
 
@@ -108,6 +103,7 @@ public class HeyzineManagementClient : IHeyzineManagementClient
     /// <inheritdoc />
     public Task<HeyzineApiResult?> RemoveUserAccessAsync(HeyzineAccessRemovalRequest request, CancellationToken cancellationToken = default)
     {
+        ValidateAccessRemovalRequest(request);
         return PostAsync<HeyzineAccessRemovalRequest, HeyzineApiResult>(Constants.ACCESS_REMOVE_POSTFIX, request, cancellationToken);
     }
 
@@ -145,6 +141,69 @@ public class HeyzineManagementClient : IHeyzineManagementClient
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(identifier, parameterName);
         return identifier;
+    }
+
+    private static void ValidateAccessEntryRequest(HeyzineAccessEntryRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.Name, nameof(request.Name));
+
+        if (request.AccessType is null)
+        {
+            throw new ArgumentNullException(nameof(request.AccessType));
+        }
+
+        if (RequiresUser(request.AccessType.Value))
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.User, nameof(request.User));
+        }
+
+        if (RequiresPassword(request.AccessType.Value))
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Password, nameof(request.Password));
+        }
+    }
+
+    private static void ValidateAccessSetupRequest(HeyzineAccessSetupRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.Name, nameof(request.Name));
+
+        if (request.Mode is null)
+        {
+            throw new ArgumentNullException(nameof(request.Mode));
+        }
+
+        if (request.Mode is HeyzineAccessMode.Everyone)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Password, nameof(request.Password));
+        }
+    }
+
+    private static void ValidateAccessRemovalRequest(HeyzineAccessRemovalRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.Name, nameof(request.Name));
+
+        if (string.IsNullOrWhiteSpace(request.User) && string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new ArgumentException("Either a user or password must be supplied when removing access.", nameof(request));
+        }
+    }
+
+    private static bool RequiresPassword(HeyzineAccessType accessType)
+    {
+        return accessType is HeyzineAccessType.UserPassword
+            or HeyzineAccessType.PasswordOnly
+            or HeyzineAccessType.OneTimePassword;
+    }
+
+    private static bool RequiresUser(HeyzineAccessType accessType)
+    {
+        return accessType is HeyzineAccessType.UserPassword
+            or HeyzineAccessType.Google
+            or HeyzineAccessType.EmailLink
+            or HeyzineAccessType.SendCode;
     }
 
     private sealed class DeleteFlipbookRequest
