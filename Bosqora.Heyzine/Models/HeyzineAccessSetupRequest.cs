@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Bosqora.Heyzine.Enumerations;
+
 namespace Bosqora.Heyzine.Models;
 
 /// <summary>
@@ -8,10 +10,10 @@ namespace Bosqora.Heyzine.Models;
 public class HeyzineAccessSetupRequest
 {
     /// <summary>
-    /// Gets or sets the protection mode. Supported values are "users", "everyone", and "disabled".
+    /// Gets or sets the protection mode.
     /// </summary>
     [JsonPropertyName("mode")]
-    public string? Mode { get; set; }
+    public HeyzineAccessMode? Mode { get; set; }
 
     /// <summary>
     /// Gets or sets the flipbook identifier to configure.

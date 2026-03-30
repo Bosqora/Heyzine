@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Bosqora.Heyzine.Enumerations;
+
 namespace Bosqora.Heyzine.Models;
 
 /// <summary>
@@ -24,9 +26,9 @@ public class HeyzineResponse
     public Uri? Pdf { get; set; }
 
     /// <summary>
-    /// Gets or sets the async conversion state, such as "started", "processed", or "failed".
+    /// Gets or sets the async conversion state when the async endpoint is used.
     /// </summary>
-    public string? State { get; set; }
+    public HeyzineConversionState? State { get; set; }
 
     /// <summary>
     /// Gets or sets the generated thumbnail URL.

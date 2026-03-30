@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Bosqora.Heyzine.Enumerations;
+
 namespace Bosqora.Heyzine.Models;
 
 /// <summary>
@@ -8,10 +10,10 @@ namespace Bosqora.Heyzine.Models;
 public class HeyzineAccessEntryRequest
 {
     /// <summary>
-    /// Gets or sets the access method. Supported values are "user_pass", "google", "pass_only", "otp", "email_link", and "send_code".
+    /// Gets or sets the access method.
     /// </summary>
     [JsonPropertyName("access_type")]
-    public string? AccessType { get; set; }
+    public HeyzineAccessType? AccessType { get; set; }
 
     /// <summary>
     /// Gets or sets the flipbook identifier that will receive the access entry.
