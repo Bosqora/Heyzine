@@ -17,9 +17,8 @@ public class EnvironmentVariableNotSetException : Exception
     /// </summary>
     /// <param name="variableName">The missing environment variable name.</param>
     public EnvironmentVariableNotSetException(string variableName)
-        : base(string.Format(Constants.ERRORS_ENVVAR_NOTSET, variableName))
+        : base(string.Format(Constants.ERRORS_ENVVAR_NOTSET, variableName ?? throw new ArgumentNullException(nameof(variableName))))
     {
-        ArgumentNullException.ThrowIfNull(variableName, nameof(variableName));
     }
 
     /// <summary>
@@ -28,8 +27,7 @@ public class EnvironmentVariableNotSetException : Exception
     /// <param name="variableName">The missing environment variable name.</param>
     /// <param name="innerException">The exception that caused the current exception.</param>
     public EnvironmentVariableNotSetException(string variableName, Exception innerException)
-        : base(string.Format(Constants.ERRORS_ENVVAR_NOTSET, variableName), innerException)
+        : base(string.Format(Constants.ERRORS_ENVVAR_NOTSET, variableName ?? throw new ArgumentNullException(nameof(variableName))), innerException)
     {
-        ArgumentNullException.ThrowIfNull(variableName, nameof(variableName));
     }
 }
