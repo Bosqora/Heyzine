@@ -34,8 +34,8 @@ public static class ServiceCollectionExtensions
     /// </remarks>
     public static IServiceCollection AddHeyzine(this IServiceCollection serviceCollection, Action<HeyzineClientOptions> configureOptions)
     {
-        ArgumentNullException.ThrowIfNull(serviceCollection, nameof(serviceCollection));
-        ArgumentNullException.ThrowIfNull(configureOptions, nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(serviceCollection);
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         var options = new HeyzineClientOptions();
         configureOptions(options);
