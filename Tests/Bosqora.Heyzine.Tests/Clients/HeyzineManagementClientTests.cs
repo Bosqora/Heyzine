@@ -1,8 +1,9 @@
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Bosqora.Heyzine.Clients;
+using Bosqora.Heyzine.Enumerations;
 using Bosqora.Heyzine.Exceptions;
 using Bosqora.Heyzine.Models;
 
@@ -88,6 +89,59 @@ public class HeyzineManagementClientTests
         Assert.Equal(2, response!.Count);
     }
 
+    [Fact]
+    public async Task AddUserAccessAsync_WhenCalled_ShouldSerializeAccessType()
+    {
+        Environment.SetEnvironmentVariable(Constants.APIKEY_SETTINGNAME, "testApiKey");
+
+        HttpRequestMessage? capturedRequest = null;
+        var client = new HeyzineManagementClient(CreateHttpClientFactory(request =>
+        {
+            capturedRequest = request;
+            return JsonResponse(new HeyzineApiResult { Success = true });
+        }));
+
+        await client.AddUserAccessAsync(new HeyzineAccessEntryRequest
+        {
+            Name = "flipbook-id",
+            AccessType = HeyzineAccessType.UserPassword,
+            User = "reader@heyzine.com",
+            Password = "mYp4ssW0rd"
+        });
+
+        using var payload = JsonDocument.Parse(await capturedRequest!.Content!.ReadAsStringAsync());
+        Assert.Equal("user_pass", payload.RootElement.GetProperty("access_type").GetString());
+    }
+
+    [Fact]
+    public async Task ConfigurePasswordProtectionAsync_WhenModeIsEveryoneWithoutPassword_ShouldThrow()
+    {
+        Environment.SetEnvironmentVariable(Constants.APIKEY_SETTINGNAME, "testApiKey");
+        var client = new HeyzineManagementClient(CreateHttpClientFactory());
+
+        var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => client.ConfigurePasswordProtectionAsync(new HeyzineAccessSetupRequest
+        {
+            Name = "flipbook-id",
+            Mode = HeyzineAccessMode.Everyone
+        }));
+
+        Assert.Equal("Password", exception.ParamName);
+    }
+
+    [Fact]
+    public async Task RemoveUserAccessAsync_WithoutUserOrPassword_ShouldThrow()
+    {
+        Environment.SetEnvironmentVariable(Constants.APIKEY_SETTINGNAME, "testApiKey");
+        var client = new HeyzineManagementClient(CreateHttpClientFactory());
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => client.RemoveUserAccessAsync(new HeyzineAccessRemovalRequest
+        {
+            Name = "flipbook-id"
+        }));
+
+        Assert.Equal("request", exception.ParamName);
+    }
+
     private static IHttpClientFactory CreateHttpClientFactory(Func<HttpRequestMessage, HttpResponseMessage>? responseFactory = null)
     {
         return new StubHttpClientFactory(new StubHttpMessageHandler(responseFactory ?? (_ => JsonResponse(new HeyzineApiResult { Success = true }))));
@@ -97,9 +151,14 @@ public class HeyzineManagementClientTests
     {
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(JsonSerializer.Serialize(payload))
+            Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions))
         };
     }
+
+    private static JsonSerializerOptions JsonSerializerOptions { get; } = new()
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
 
     private sealed class StubHttpClientFactory(HttpMessageHandler handler) : IHttpClientFactory
     {

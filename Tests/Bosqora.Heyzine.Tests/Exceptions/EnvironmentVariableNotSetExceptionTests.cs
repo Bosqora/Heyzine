@@ -4,14 +4,10 @@ namespace Bosqora.Heyzine.Tests.Exceptions;
 
 public class EnvironmentVariableNotSetExceptionTests
 {
-    #region Constants
-
     const string defaultExceptionMessage = "Exception of type 'Bosqora.Heyzine.Exceptions.EnvironmentVariableNotSetException' was thrown.";
     const string variableName = "HeyzineTestVariable";
 
-    Exception innerException = new("Inner exception");
-
-    #endregion
+    static readonly Exception innerException = new("Inner exception");
 
     [Fact]
     public void Constructor_ShouldInitializeException()
@@ -37,9 +33,7 @@ public class EnvironmentVariableNotSetExceptionTests
     [Fact]
     public void Constructor_WhenVariableNameNull_ShouldThrowArgumentNullException()
     {
-        string? variableName = null;
-
-        var exception = Assert.Throws<ArgumentNullException>(() => new EnvironmentVariableNotSetException(variableName));
+        var exception = Assert.Throws<ArgumentNullException>(() => new EnvironmentVariableNotSetException(null!));
 
         Assert.Equal("variableName", exception.ParamName);
     }

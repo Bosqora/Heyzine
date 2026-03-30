@@ -1,8 +1,9 @@
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Bosqora.Heyzine.Clients;
+using Bosqora.Heyzine.Enumerations;
 using Bosqora.Heyzine.Exceptions;
 using Bosqora.Heyzine.Models;
 
@@ -75,7 +76,7 @@ public class HeyzineRestClientTests
             return JsonResponse(new HeyzineResponse
             {
                 Id = "success",
-                State = "started"
+                State = HeyzineConversionState.Started
             });
         }));
 
@@ -86,7 +87,7 @@ public class HeyzineRestClientTests
         });
 
         Assert.NotNull(response);
-        Assert.Equal("started", response!.State);
+        Assert.Equal(HeyzineConversionState.Started, response!.State);
         Assert.Equal(new Uri("https://heyzine.com/api1/async"), capturedRequest?.RequestUri);
     }
 
@@ -134,9 +135,14 @@ public class HeyzineRestClientTests
     {
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent(JsonSerializer.Serialize(payload))
+            Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions))
         };
     }
+
+    private static JsonSerializerOptions JsonSerializerOptions { get; } = new()
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
 
     private sealed class StubHttpClientFactory(HttpMessageHandler handler) : IHttpClientFactory
     {
